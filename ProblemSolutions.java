@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Malec Basel Tarabein / 002
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
@@ -8,6 +8,8 @@
  ********************************************************************/
 
 import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.ArrayList;
 
 public class ProblemSolutions {
 
@@ -35,13 +37,19 @@ public class ProblemSolutions {
     public static void selectionSort(int[] values, boolean ascending ) {
 
         int n = values.length;
+        int index = 1;
 
-        for (int i = 0; i < n - 1; i++) {
-
-            // YOU CODE GOES HERE -- COMPLETE THE INNER LOOP OF THIS
-            // "SELECTION SORT" ALGORITHM.
-            // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
-
+        while(index < n) {
+            int select = index;
+            if (select >= 1 && (values[select-1] < values[select] ^ ascending)) {
+                while (select >= 1 && (values[select-1] < values[select] ^ ascending)) {
+                    int temp = values[select-1];
+                    values[select-1] = values[select];
+                    values[select--] = temp;
+                }
+            } else {
+                index++;
+            }
         }
 
     } // End class selectionSort
@@ -102,7 +110,43 @@ public class ProblemSolutions {
         // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
         // OF THIS PROGRAMMING EXERCISES.
 
-        return;
+        int low = left;
+        int high = mid + 1;
+        int temp[] = new int[right-left+1];
+        int i = 0;
+
+        while(low <= mid && high <= right) {
+            if(arr[low]%k == 0 ^ arr[high]%k == 0) {
+                if(arr[low]%k == 0) {
+                    temp[i++] = arr[low++];
+                } else {
+                    temp[i++] = arr[high++];
+                }
+            } else {
+                if(arr[low] < arr[high]) {
+                    temp[i++] = arr[low++];
+                } else {
+                    temp[i++] = arr[high++];
+                }
+            }
+        }
+
+        while(low <= mid) {
+            temp[i++] = arr[low++];
+        }
+
+        while(high <= right) {
+            temp[i++] = arr[high++];
+        }
+
+        i = 0;
+        low = left;
+        while(low <= right) {
+            arr[low++] = temp[i++];
+        }
+
+        //System.out.println(Arrays.toString(arr));
+        //System.out.println(left + " through " + right + ", div. by " + k + "\n");
 
     }
 
@@ -156,7 +200,24 @@ public class ProblemSolutions {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
 
-        return false;
+        PriorityQueue<Integer> floyd_roids = new PriorityQueue();
+
+        /** im listening to pink floyd right now, that's why it's named like that*/
+
+        for(int floyd_roid : asteroids) {
+            floyd_roids.add(floyd_roid);
+        }
+
+        while(!floyd_roids.isEmpty()) {
+            Integer curr = floyd_roids.poll();
+            if(curr != null && mass >= curr) {
+                mass += curr;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
 
     }
 
@@ -194,7 +255,41 @@ public class ProblemSolutions {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
 
-        return -1;
+        Arrays.sort(people);
+        ArrayList<Integer> peeps = new ArrayList<Integer>();
+        for (int person : people) {
+            peeps.add(person);
+        }
+
+        int numSleds = 0;
+
+        while(peeps.size() >= 2) {
+            int lightest = peeps.remove(0);
+
+            /** If the lightest person is heavier than the sled, then we cannot save any more */
+            if(lightest > limit) {
+                break;
+            }
+
+            /** Traverse the array to find the heaviest fellow that can fit on the sled with our current guy */
+            int index = peeps.size()-1;
+            while(index >= 0 && peeps.get(index) + lightest > limit) {
+                index--;
+            }
+
+            /** If we found a pair for our guy, we can put them on the same sled. */
+            if(index >= 0) {
+                peeps.remove(index);
+            }
+
+            numSleds++;
+        }
+
+        // check if we have one guy left, and, if so, whether he can fit on the sled
+        if(peeps.size() == 1 && peeps.get(0) <= limit)
+            numSleds++;
+
+        return numSleds;
 
     }
 
